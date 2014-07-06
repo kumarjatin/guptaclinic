@@ -1,0 +1,142 @@
+{{extend 'layout.html'}}
+<!--style>
+    body{
+        background: #e9e9e9
+    }
+    img{
+        max-width: 100%;
+    }
+    #wrapper{
+        margin: 50px auto;text-align: center;width: 50%;height: auto;background: #fff;
+        border: 1px solid #ccc;padding-bottom: 50px
+    }
+    #wrapper_heading2{
+        height: 70px;margin: 50px 25% 0 25%;font-size: 28px;color: #e56a0f
+    }
+    .inputs{
+        margin-top: 50px;border: 1px solid #e5e5e5;
+        height: 50px;width: 300px;padding-left: 20px;color: #e56a0f;outline: 0;
+        
+        border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+    }
+    #result{
+        width: 100%;padding-top: 50px;font-size: 22px;letter-spacing: 1px;line-height: 25px;color: #999    
+    }
+    
+    #share{
+        position: fixed;z-index: 9999;top: 50px;left: 20px;width: 200px;height: 500px;background: #fff;
+        border: 1px solid #ccc
+    }
+    ul li{
+        display: block;margin: 30px auto
+    }
+    .notify{
+        width: auto;height: auto;overflow: auto;margin-left: 50px;border: 3px dashed #aaa;background: #fff;
+        position: absolute;z-index: 5000;padding: 20px;display: none;
+    }
+    #addtopic{
+        width: 80%;height: auto;overflow: auto;border: 1px solid #ccc;padding-bottom: 20px;text-align: center;display: none;
+        margin: 50px auto;font-size: 18px;color: #999
+    }
+</style-->
+<!--script>
+    $(document).ready(function(){
+        $("#addrecord").hover(function(){
+            $(".notify").fadeIn("500");
+        },function(){
+            $(".notify").fadeOut("500");
+        });
+        
+        $("#addrecord").click(function(){
+            $("#addtopic").slideDown("500");
+        });
+        
+        $("#add").keydown(function(e){
+        var keycode = (e.keyCode ? e.keyCode : e.which);
+        if(keycode == 13){
+                    $("#add").hide();
+                    var value = $("#add").val();
+                    $.post("save.php",{value:value}, function(data){
+                        $("#addtopic").html(data);
+                        setTimeout("location.reload(true);",5);
+                    });
+                }
+            });   
+    });
+</script-->
+<script>
+$(function() {
+    function log( message ) {
+        $( "#result" ).text(message);
+        $( "body" ).scrollTop( 0 );
+    }
+    $( "#search_input" ).autocomplete({
+        source: "{{=URL(r=request, c='main', f='search_patient_name_mobile')}}",
+        minlength: 1,
+        response: function(event, ui) {
+            if(ui.content.length == 0) {
+                $("#add_button").show();
+                $("#modify_button").hide();
+                $("#add_visit").hide();
+            }
+            else {
+                $("#add_button").hide();
+                $("#modify_button").show();
+                $("#add_visit").show();
+            }
+        
+            console.log(ui.content);
+        },
+        select: function( event, ui ) {
+            var patient = $("#search_input").val();
+            var pid =  patient.split('.')[0];
+            var pid = pid.split('#')[1];
+            fetchRecords(pid);
+        }
+    });
+});
+
+function fetchRecords(pid)
+{
+   $.ajax({url:"{{=URL(r=request, c='main', f='search_patient')}}/"+pid,
+           success:function(result){
+                if(result === 'None') {
+                    $("#patient_records").html("No records found");
+                }
+                else{
+                    $("#patient_records").html(result);
+                }
+           }
+    });
+}
+
+$(document).ready(function() { 
+    $("#modify_button").click(function() {
+        var patient = $("#search_input").val();
+        var pid =  patient.split('.')[0];
+        var pid = pid.split('#')[1];
+        var url = "{{=URL(r=request, c='main', f='edit_patient')}}/" + pid;
+        window.location = url;
+    });
+    $("#add_visit").click(function() {
+        var patient = $("#search_input").val();
+        var pid =  patient.split('.')[0];
+        var pid = pid.split('#')[1];
+        var url = "{{=URL(r=request, c='main', f='add_visit')}}?pid=" + pid;
+        window.location = url;
+    });
+    $("#add_button").click(function() {
+        var patient = $("#search_input").val();
+        var url = "{{=URL(r=request, c='main', f='add_patient')}}?name=" + patient;
+        window.location = url;
+    });
+});
+</script>
+<h2>Patient Search</h2>
+<input id="search_input" name="search_input" type="text" placeholder="Enter name or mobile"></input>
+<a class="btn" id="add_button" style="display:none">Add Patient</a>
+<a class="btn" id="modify_button" style="display:none">Update Patient</a>
+<a class="btn" id="add_visit" style="display:none">Add Visit</a>
+<div id="patient_records"></div>

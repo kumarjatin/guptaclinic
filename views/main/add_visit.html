@@ -1,0 +1,49 @@
+{{extend 'layout.html'}}
+<h2>Add visit</h2>
+{{if any(details):}}
+<table class="table table-striped table-bordered table-condensed">
+    <thead>
+        <td>Patient ID</td>
+        <td>Name</td>
+        <td>Mobile</td>
+        <td>Address</td>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{=details['id']}}</td>
+            <td>{{=details['name']}}</td>
+            <td>{{=details['mobile']}}</td>
+            <td>{{=details['address']}}</td>
+        </tr>
+    </tbody>
+</table>
+{{pass}}
+{{=form}}
+
+<hr>
+<h3>Previous records</h3>
+{{if any(records):}}
+<table class="table table-striped table-bordered table-condensed">
+    <thead>
+        <td>ID</td>
+        <td>Date</td>
+        <td>Diagnosis</td>
+        <td>Treatment</td>
+        <td>Remarks</td>
+    </thead>
+    <tbody>
+        {{for record in records:}}
+            <tr>
+                <td>{{=record['id']}}</td>
+                <td>{{=record['currentdate']}}</td>
+                <td>{{=record['diagnosis']}}</td>
+                <td>{{=record['treatment']}}</td>
+                <td>{{=record['remarks']}}</td>
+            </tr>
+        {{pass}}
+    </tbody>
+</table>
+{{else:}}
+No previous records found.
+{{pass}}
+

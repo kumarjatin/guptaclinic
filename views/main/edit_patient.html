@@ -1,0 +1,17 @@
+{{extend 'layout.html'}}
+<h2> Update patient (PID: {{=pid}})</h2>
+{{=form}}
+<script>
+function mobileAlert() {
+    alert("came here");
+    var mobile = $("#patients_mobile").val();
+
+    if(mobile == "")
+    {
+        return confirm("Are you sure you don't want to enter mobile number");
+    };
+}
+$('type=["submit"]').click(function() {
+    mobileAlert();
+});
+</script>
