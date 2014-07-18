@@ -40,6 +40,51 @@
   <script src="{{=URL('static','js/modernizr.custom.js')}}"></script>
 
   <!-- include stylesheets -->
+  <style>
+  .repeat_btn
+  {
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+  }
+  .clockbox {
+    font-size: 11pt;
+    color: ghostwhite;
+    margin-right: -45px;
+  }
+  </style>
+
+<script type="text/javascript">
+tday  =new Array("Sun","Mon","Tue","Wed","Thu","Fri","Sat");
+tmonth=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec");
+
+function GetClock(){
+d = new Date();
+nday   = d.getDay();
+nmonth = d.getMonth();
+ndate  = d.getDate();
+nyear = d.getYear();
+nhour  = d.getHours();
+nmin   = d.getMinutes();
+nsec   = d.getSeconds();
+
+if(nyear<1000) nyear=nyear+1900;
+
+     if(nhour ==  0) {ap = "AM";nhour = 12;} 
+else if(nhour <= 11) {ap = "AM";} 
+else if(nhour == 12) {ap = "PM";} 
+else if(nhour >= 13) {ap = "PM";nhour -= 12;}
+
+if(nmin <= 9) {nmin = "0" +nmin;}
+if(nsec <= 9) {nsec = "0" +nsec;}
+
+
+document.getElementById('clockbox').innerHTML=tmonth[nmonth]+" "+ndate+" ("+tday[nday]+")"+", "+nhour+":"+nmin+ap;
+setTimeout("GetClock()", 1000);
+}
+window.onload=GetClock;
+</script>
+
   {{  
   response.files.append(URL('static','css/web2py.css'))
   response.files.append(URL('static','css/bootstrap.min.css'))
@@ -87,6 +132,7 @@
         </button>
 	{{=response.logo or ''}}
         <!--ul id="navbar" class="nav pull-right">{{='auth' in globals() and auth.navbar(mode="dropdown") or ''}}</ul-->
+	  <ul id="clockbox" class="nav pull-right clockbox"></ul>
         <ul id="navbar" class="nav pull-right">{{=response.doctor}}</ul>
         <div class="nav-collapse">
           {{is_mobile=request.user_agent().is_mobile}}
@@ -145,7 +191,7 @@
             <div class="footer-content">
                 {{block footer}} <!-- this is default footer -->
                 <div class="copyright pull-left">{{=T('Copyright')}} &#169; {{=request.now.year}}</div>
-                <div style="text-align:center"><a href="https://www.facebook.com/sachiggupta">Dr. Sachin Garg (MOT)</a></div>
+                <div style="text-align:center"><a href="https://www.facebook.com/sachiggupta">Dr. Sachin Gupta (MOT)</a></div>
                 <div id="poweredBy" class="pull-right">
                     {{=T('Powered by')}}
                     <a href="http://www.web2py.com/">web2py</a>

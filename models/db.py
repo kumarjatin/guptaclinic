@@ -85,6 +85,7 @@ use_janrain(auth, filename='private/janrain.key')
 db.define_table('patients',
     Field('name', 'string', notnull=True, requires=IS_NOT_EMPTY(error_message='Fill patient name')),
     Field('mobile', 'string'),
+    Field('gender', requires=IS_IN_SET(['Male', 'Female', 'Others'])),
     Field('age', 'integer', notnull=True, requires=[IS_NOT_EMPTY(error_message='Fill patient age'), IS_INT_IN_RANGE(1, 100, error_message='Invalid age')]),
     Field('address', 'text', length=200),
     Field('startdate', 'datetime', default=get_datetime(), readable=False, writable=False))
@@ -94,4 +95,13 @@ db.define_table('visits',
     Field('currentdate', 'datetime', default=get_datetime(), readable=False, writable=False),
     Field('diagnosis', 'string', notnull=True),
     Field('treatment', 'string', notnull=True),
-    Field('remarks', 'text', length=1000))
+    Field('next_visit', 'integer', notnull=False, default=1),
+    Field('remarks', 'text', length=1000, default='N/A'))
+
+db.define_table('visits_backup',
+    Field('pid', db.patients, requires = IS_IN_DB(db, 'patients.id', '%(name)s (%(mobile)s)')),
+    Field('currentdate', 'datetime', default=get_datetime(), readable=False, writable=False),
+    Field('diagnosis', 'string', notnull=True),
+    Field('treatment', 'string', notnull=True),
+    Field('next_visit', 'integer', notnull=False, default=1),
+    Field('remarks', 'text', length=1000, default='N/A'))

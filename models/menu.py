@@ -5,7 +5,7 @@
 ## Customize your APP title, subtitle and menus here
 #########################################################################
 
-response.logo = A(B(SPAN('Gupta Clinic')),_class="brand")
+response.logo = A(B(SPAN('Gupta Clinic')),_class="brand", _href=URL('main', 'search'))
 response.doctor = A(B(SPAN('Dr. Sachin Gupta')), _class="brand", _href=URL('main', 'aboutme'))
 response.title = None #request.application.replace('_',' ').title()
 response.subtitle = None #T('Dr. Sachin Garg\'s clinic')
@@ -26,7 +26,8 @@ response.google_analytics_id = None
 response.menu = [
     (T('Search'), False, URL('main', 'search'), []),
     (T('Add Patient'), False, URL('main', 'add_patient'), []),
-    (T('Add Visit'), False, URL('main', 'add_visit'), [])
+    (T('Add Visit'), False, URL('main', 'add_visit'), []),
+    (T('Today\'s Visit'), False, URL('main', 'get_visits_by_date'), [])
 ]
 
 DEVELOPMENT_MENU = False
