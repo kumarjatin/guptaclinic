@@ -1,0 +1,34 @@
+{{extend 'layout.html'}}
+<form enctype="multipart/form-data" action="{{=URL()}}" method="GET">
+<input name="date" type="date"/>
+<input type="submit"/>
+</form>
+<h2>Visits on {{=visits_date}}:</h2>
+{{if any(visits):}}
+<table class="table table-striped table-bordered table-condensed">
+    <thead>
+        <td>Patient ID</td>
+        <td>Name</td>
+        <td>Mobile</td>
+        <td>Age</td>
+        <td>Diagnosis</td>
+        <td>Treatment</td>
+        <td>Time</td>
+    </thead>
+    <tbody>
+	{{for visit in visits:}}
+        <tr>
+            <td>{{=visit.patients.id}}</td>
+            <td>{{=visit.patients.name}}</td>
+            <td>{{=visit.patients.mobile}}</td>
+            <td>{{=getCurrentAge(visit.patients.age, visit.patients.startdate)}}</td>
+            <td>{{=visit.visits.diagnosis}}</td>
+            <td>{{=visit.visits.treatment}}</td>
+            <td>{{=visit.visits.currentdate.time()}}</td>
+        </tr>
+      {{pass}}
+    </tbody>
+</table>
+{{else:}}
+<p> No records found </p>
+{{pass}}

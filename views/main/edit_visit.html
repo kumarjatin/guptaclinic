@@ -1,0 +1,68 @@
+{{extend 'layout.html'}}
+<h2> Update Visit</h2>
+{{if any(details):}}
+<table class="table table-striped table-bordered table-condensed">
+    <thead>
+        <td>Patient ID</td>
+        <td>Name</td>
+        <td>Mobile</td>
+        <td>Age</td>
+        <td>Gender</td>
+        <td>Address</td>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{=details['id']}}</td>
+            <td>{{=details['name']}}</td>
+            <td>{{=details['mobile']}}</td>
+            <td>{{=getCurrentAge(details['age'], details['startdate'])}}</td>
+            <td>{{=details['gender']}}</td>
+            <td>{{=details['address']}}</td>
+        </tr>
+    </tbody>
+</table>
+{{pass}}
+<div id="edit_visit_form">
+{{=form}}
+</div>
+<script>
+$(document).ready(function() { 
+    $("#visits_diagnosis").focus();
+
+    //Adjust textarea rows
+    var textareas = document.getElementsByTagName("textarea");
+    for(var i=0; i<textareas.length; i++) {
+	    textareas[i].setAttribute("rows", "2");
+    };
+
+    //Split treatment field into two
+    var treatment_row = document.getElementById("visits_treatment__row");
+    var treatment_input = treatment_row.querySelectorAll("td")[1];
+    var tinput = treatment_input.querySelectorAll("input")[0];
+    var tinput_value = tinput.getAttribute("value");
+    tinput.setAttribute("style", "display:none");
+    var tparts = tinput_value.split('(');
+    var drug_value = tparts[0].trim(' ');
+    var mach_value;
+    if(tparts.length==1) {
+        mach_value = "";
+    } else {
+        mach_value = tparts[1].split(')')[0];
+    };
+    var machInputHTML = '<input class="string" id="visits_treatment_mach" name="visits_treatment_mach" type="text" value="'+mach_value+'" placeholder="Machines" style="width:140px">';
+    var drugInputHTML = '<input class="string" id="visits_treatment_drug" name="visits_treatment_drug" type="text" value="'+drug_value+'" placeholder="Data" style="width:140px">';
+    treatment_input.innerHTML += drugInputHTML + machInputHTML;
+    
+    //Set handler function for submit to update original input field
+    $("#edit_visit_form").submit(function(event) {
+        var mach_value = $("#visits_treatment_mach").val();
+        var drug_value = $("#visits_treatment_drug").val();
+        if(mach_value != "") {
+            mach_value_new = ' (' + mach_value + ')';
+        } else {
+            mach_value_new = '';
+        };
+	  $("#visits_treatment").attr("value", drug_value + mach_value_new);
+    });
+});
+</script>

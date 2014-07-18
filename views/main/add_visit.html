@@ -1,4 +1,25 @@
 {{extend 'layout.html'}}
+{{from datetime import timedelta}}
+<script>
+function repeat_row(row_id, next_visit) {
+      console.log('came here');
+	var row_data = document.getElementById("visitrow"+row_id).querySelectorAll("td");
+	$("#visits_diagnosis").val(row_data[2].innerText);
+	var tvalue = row_data[3].innerText;
+      var drug_value = tvalue.split('(')[0];
+      var mach_value;
+      if(tvalue.split('(').length == 1) {
+          mach_value = "";
+      }else{
+          mach_value = tvalue.split('(')[1].split(')')[0];
+      }
+      $("#visits_treatment_drug").val(drug_value);
+      $("#visits_treatment_mach").val(mach_value);
+	$("#visits_treatment").val(row_data[3].innerText);
+	$("#visits_next_visit").val(next_visit);
+	$("#visits_remarks").val(row_data[5].innerText);
+};
+</script>
 <h2>Add visit</h2>
 {{if any(details):}}
 <table class="table table-striped table-bordered table-condensed">
@@ -6,6 +27,8 @@
         <td>Patient ID</td>
         <td>Name</td>
         <td>Mobile</td>
+        <td>Age</td>
+        <td>Gender</td>
         <td>Address</td>
     </thead>
     <tbody>
@@ -13,31 +36,47 @@
             <td>{{=details['id']}}</td>
             <td>{{=details['name']}}</td>
             <td>{{=details['mobile']}}</td>
+            <td>{{=getCurrentAge(details['age'], details['startdate'])}}</td>
+            <td>{{=details['gender']}}</td>
             <td>{{=details['address']}}</td>
         </tr>
     </tbody>
 </table>
 {{pass}}
+<div id="add_visit_form">
 {{=form}}
-
+</div>
 <hr>
 <h3>Previous records</h3>
+{{counter=1}}
 {{if any(records):}}
 <table class="table table-striped table-bordered table-condensed">
     <thead>
-        <td>ID</td>
+        <td>Actions</td>
         <td>Date</td>
         <td>Diagnosis</td>
-        <td>Treatment</td>
+        <td>Treatment D(M)</td>
+        <td>Next Visit</td>
         <td>Remarks</td>
     </thead>
     <tbody>
         {{for record in records:}}
-            <tr>
-                <td>{{=record['id']}}</td>
+            {{counter += 1}}
+            <tr id={{="visitrow"+str(counter)}}>
+                <td>
+			<img onclick="repeat_row({{=counter}},{{=record['next_visit']}})" title="Repeat" src="{{=URL('static', 'images/repeat.png')}}" class="repeat_btn"/>&nbsp;
+			<a href="{{=URL('edit_visit', vars=dict(vid=record['id']))}}"><img title="Update" src="{{=URL('static', 'images/update.png')}}" class="repeat_btn"/></a>
+                </td>
                 <td>{{=record['currentdate']}}</td>
                 <td>{{=record['diagnosis']}}</td>
                 <td>{{=record['treatment']}}</td>
+                <td>
+			{{if record['next_visit']:}}
+			{{= (record['currentdate'] + timedelta(days=int(record['next_visit']))).date()}}
+		    	{{else:}}
+			Not Scheduled
+			{{pass}}
+		    </td>
                 <td>{{=record['remarks']}}</td>
             </tr>
         {{pass}}
@@ -46,4 +85,92 @@
 {{else:}}
 No previous records found.
 {{pass}}
+<input type="submit" class="btn" id="showmore" value="Show More"/>
+<div id="morerecords" style="display:none">
+{{if any(morerecords):}}
+<table class="table table-striped table-bordered table-condensed">
+    <thead>
+        <td>Actions</td>
+        <td>Date</td>
+        <td>Diagnosis</td>
+        <td>Treatment D(M)</td>
+	  <td>Next Visit</td>
+        <td>Remarks</td>
+    </thead>
+    <tbody>
+        {{for record in records:}}
+            {{counter += 1}}
+            <tr id={{="visitrow"+str(counter)}}>
+                <td>
+			<img onclick="repeat_row({{=counter}},{{=record['next_visit']}})" title="Repeat" src="{{=URL('static', 'images/repeat.png')}}" class="repeat_btn"/>&nbsp;
+			<a href="{{=URL('edit_visit', vars=dict(vid=record['id']))}}"><img title="Update" src="{{=URL('static', 'images/update.png')}}" class="repeat_btn"/></a>
+                </td>
+                <td>{{=record['currentdate']}}</td>
+                <td>{{=record['diagnosis']}}</td>
+                <td>{{=record['treatment']}}</td>
+                <td>
+			{{if record['next_visit']:}}
+			{{= (record['currentdate'] + timedelta(days=int(record['next_visit']))).date()}}
+		    	{{else:}}
+			Not Scheduled
+			{{pass}}
+		    </td>
+                <td>{{=record['remarks']}}</td>
+            </tr>
+        {{pass}}
+    </tbody>
+</table>
+{{else:}}
+No previous records found.
+</div>
+{{pass}}
+<script>
+function focusSubmitButton() {
+	var formElem = document.getElementById("submit_record__row");
+      formElem.getElementByClassName("btn")[0].focus();
+};
 
+$(document).ready(function() { 
+    $("#visits_diagnosis").focus();
+
+    $("#showmore").click(function() {
+        $("#morerecords").toggle();
+    });
+
+    //Adjust textarea rows
+    var textareas = document.getElementsByTagName("textarea");
+    for(var i=0; i<textareas.length; i++) {
+	    textareas[i].setAttribute("rows", "2");
+    };
+
+    //Split treatment field into two
+    var treatment_row = document.getElementById("visits_treatment__row");
+    var treatment_input = treatment_row.querySelectorAll("td")[1];
+    var tinput = treatment_input.querySelectorAll("input")[0];
+    var tinput_value = tinput.getAttribute("value");
+    tinput.setAttribute("style", "display:none");
+    var tparts = tinput_value.split('(');
+    var drug_value = tparts[0].trim(' ');
+    var mach_value;
+    if(tparts.length==1) {
+        mach_value = "";
+    } else {
+        mach_value = tparts[1].split(')')[0];
+    };
+    var machInputHTML = '<input class="string" id="visits_treatment_mach" name="visits_treatment_mach" type="text" value="'+mach_value+'" placeholder="Machines" style="width:140px">';
+    var drugInputHTML = '<input class="string" id="visits_treatment_drug" name="visits_treatment_drug" type="text" value="'+drug_value+'" placeholder="Data" style="width:140px">';
+    treatment_input.innerHTML += drugInputHTML + machInputHTML;
+    
+    //Set handler function for submit to update original input field
+    $("#add_visit_form").submit(function(event) {
+        var mach_value = $("#visits_treatment_mach").val();
+        var drug_value = $("#visits_treatment_drug").val();
+        if(mach_value != "") {
+            mach_value_new = ' (' + mach_value + ')';
+        } else {
+            mach_value_new = '';
+        };
+	  $("#visits_treatment").val(drug_value + mach_value_new);
+    });
+});
+</script>

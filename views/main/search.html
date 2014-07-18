@@ -82,17 +82,18 @@ $(function() {
                 $("#add_visit").hide();
             }
             else {
-                $("#add_button").hide();
+                $("#add_button").show();
                 $("#modify_button").show();
                 $("#add_visit").show();
             }
-        
-            console.log(ui.content);
         },
         select: function( event, ui ) {
-            var patient = $("#search_input").val();
+            var patient = ui.item.value;
+		console.log(patient);
             var pid =  patient.split('.')[0];
+		console.log(pid);
             var pid = pid.split('#')[1];
+		console.log(pid);
             fetchRecords(pid);
         }
     });
@@ -110,9 +111,16 @@ function fetchRecords(pid)
                 }
            }
     });
+    if($("#add_visit").is(":visible")){
+        $("#add_visit").focus();
+    } else {
+        $("#add_patient").focus();
+    };
 }
 
-$(document).ready(function() { 
+$(document).ready(function() {
+    $("#search_input").focus();
+
     $("#modify_button").click(function() {
         var patient = $("#search_input").val();
         var pid =  patient.split('.')[0];
@@ -136,7 +144,7 @@ $(document).ready(function() {
 </script>
 <h2>Patient Search</h2>
 <input id="search_input" name="search_input" type="text" placeholder="Enter name or mobile"></input>
-<a class="btn" id="add_button" style="display:none">Add Patient</a>
-<a class="btn" id="modify_button" style="display:none">Update Patient</a>
-<a class="btn" id="add_visit" style="display:none">Add Visit</a>
+<input type="submit" class="btn" id="add_visit" style="display:none" value="Add Visit"/>
+<input type="submit" class="btn" id="add_button" style="display:none" value="Add Patient"/>
+<input type="submit" class="btn" id="modify_button" style="display:none" value="Update Patient"/>
 <div id="patient_records"></div>

@@ -1,19 +1,28 @@
 {{extend 'layout.html'}}
 <h2> Add new patient </h2>
+<div id="add_patient_form">
 {{=form}}
+</div>
 <script>
 function mobileAlert() {
-    alert("came here");
     var mobile = $("#patients_mobile").val();
-
     if(mobile == "")
     {
         return confirm("Are you sure you don't want to enter mobile number");
     };
 }
-$('type=["submit"]').click(function() {
-    mobileAlert();
-});
 
-//$("#patients_address").attr("rows", 5);
+//Adjust textarea rows
+$(document).ready(function() {
+    $("#patients_name").focus();
+
+    $('#add_patient_form').submit(function(event) {
+        return mobileAlert();
+    });
+
+    var textareas = document.getElementsByTagName("textarea");
+    for(var i=0; i<textareas.length; i++) {
+        textareas[i].setAttribute("rows", "2");
+    };
+});
 </script>

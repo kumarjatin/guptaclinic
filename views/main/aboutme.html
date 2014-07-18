@@ -1,7 +1,16 @@
 {{extend 'layout.html'}}
+<script>
+function dataAction() {
+	return confirm("Are you sure you want to erase data?");
+};
+</script>
 <h3>Dr. Sachin Gupta</h3>
 <p>
 <ul>
-<li>Master in Occupation Theraphy (M.O.T)</li>
-<li>Bachelor in Physiotheraphy (B.P.T)</li>
+<li>Master's in Occupational Theraphy (M.O.T)</li>
+<li>Bachelor's in Occupational Theraphy (B.O.T)</li>
+<li>Diploma in Physiotheraphy (D.P.T)</li>
+<li>Diploma in Naturopathy & Yoga (D.N.Y)</li>
 </p>
+<a href="{{=URL('main', 'clear_data')}}" onclick="return dataAction();">Clear Data</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="{{=URL('admin', c='default', f='index')}}">Factory Reset</a>
